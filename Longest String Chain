@@ -1,0 +1,30 @@
+class Solution {
+public:
+    int longestStrChain(vector<string>& words) {
+        sort(words.begin(), words.end(), [](const string &a, const string &b){
+            return a.length() < b.length();
+        });
+
+        int n = words.size();
+        vector<int> dp(n, 1); 
+        map<string, int> mp; 
+        
+        int maxi = 1;
+        
+        for (int i = 0; i < n; i++) { 
+            for (int j = 0; j < words[i].size(); j++) {
+                string newStr = words[i]; 
+                newStr.erase(j, 1); 
+                int maxVal=0;
+                if (mp.find(newStr) != mp.end()) {
+                    maxVal = dp[mp[newStr]]+1;
+                    dp[i] = max(dp[i], maxVal);
+                }
+            }
+            maxi = max(maxi, dp[i]);
+            mp[words[i]] = i; 
+        }
+        
+        return maxi; 
+    }
+};
