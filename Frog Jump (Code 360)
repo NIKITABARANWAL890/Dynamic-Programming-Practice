@@ -1,0 +1,116 @@
+Recursion:
+#include <bits/stdc++.h>
+using namespace std;
+
+int getFrogJumps(int n, vector<int>& arr) {
+    if (n == 0) return 0;
+    
+    int firstJump = getFrogJumps(n - 1, arr) + abs(arr[n] - arr[n - 1]);
+    int secondJump = INT_MAX;
+    
+    if (n > 1) {
+        secondJump = getFrogJumps(n - 2, arr) + abs(arr[n] - arr[n - 2]);
+    }
+    
+    return min(firstJump, secondJump);
+}
+
+int main() {
+    vector<int> arr = {7, 4, 4, 2, 6, 6, 3, 4};
+    int n = arr.size(); // Fix: Get the size of the array
+    cout << getFrogJumps(n - 1, arr); // Fix: Pass `n-1` to avoid out-of-bounds access
+    return 0;
+}
+
+Memoization:
+
+#include <bits/stdc++.h>
+using namespace std;
+
+int getFrogJumps(int n, vector<int>& arr, vector<int>&memo) {
+    if (n == 0) return 0;
+    
+    if(memo[n]!=-1){
+        return memo[n];
+    }
+    
+    int firstJump = getFrogJumps(n - 1, arr, memo) + abs(arr[n] - arr[n - 1]);
+    int secondJump = INT_MAX;
+    
+    if (n > 1) {
+        secondJump = getFrogJumps(n - 2, arr, memo) + abs(arr[n] - arr[n - 2]);
+    }
+    
+    return memo[n] = min(firstJump, secondJump);
+}
+
+int main() {
+    vector<int> arr = {7, 4, 4, 2, 6, 6, 3, 4};
+    int n = arr.size(); // Fix: Get the size of the array
+    vector<int>memo(n+1, -1);
+    cout << getFrogJumps(n - 1, arr, memo); // Fix: Pass `n-1` to avoid out-of-bounds access
+    return 0;
+}
+
+
+DP:
+//Space- O(n), Time- O(n)
+#include <bits/stdc++.h>
+using namespace std;
+
+int getFrogJumps(int n, vector<int>& arr, vector<int>& dp) {
+    dp[0] = 0;
+
+    for (int i = 1; i < n; i++) {
+        int firstJump = dp[i - 1] + abs(arr[i] - arr[i - 1]); 
+        int secondJump = INT_MAX;
+
+        if (i > 1) { // Fix: Check `i > 1` instead of `n > 1`
+            secondJump = dp[i - 2] + abs(arr[i] - arr[i - 2]); 
+        }
+        
+        dp[i] = min(firstJump, secondJump);
+    }
+    
+    return dp[n - 1];
+}
+
+int main() {
+    vector<int> arr = {7, 4, 4, 2, 6, 6, 3, 4};
+    int n = arr.size();
+    vector<int> dp(n, 0);
+    cout << getFrogJumps(n, arr, dp);
+    return 0;
+}
+
+
+//Space- O(1), Time- O(n)
+#include <bits/stdc++.h>
+using namespace std;
+
+int getFrogJumps(int n, vector<int>& arr) {
+    int prev1 = 0;
+    int prev2 = 0;
+    for (int i = 1; i < n; i++) {
+        int firstJump = prev1 + abs(arr[i] - arr[i - 1]); // Fix: Correct indexing
+        int secondJump = INT_MAX;
+
+        if (i > 1) { // Fix: Check `i > 1` instead of `n > 1`
+            secondJump = prev2 + abs(arr[i] - arr[i - 2]); // Fix: Correct indexing
+        }
+        
+        int curr = min(firstJump, secondJump);
+        prev2 = prev1;
+        prev1 = curr;
+
+    }
+    
+    return prev1; // Fix: Return last element of DP table
+}
+
+int main() {
+    vector<int> arr = {7, 4, 4, 2, 6, 6, 3, 4};
+    int n = arr.size();
+    cout << getFrogJumps(n, arr);
+    return 0;
+}
