@@ -1,0 +1,46 @@
+DP:
+//Space- O(n), Time- O(n)
+#include <bits/stdc++.h>
+using namespace std;
+
+int getStairsJump(int n, vector<int>&dp){
+    dp[0] = 0;
+    dp[1]=1;
+    dp[2]=2;
+    for(int i=3; i<=n; i++){
+        dp[i]=dp[i-1]+dp[i-2];
+    }
+    return dp[n];
+}
+
+int main() {
+    int n;
+    cin >> n;
+    vector<int>dp(n+1, 0);
+    cout << getStairsJump(n, dp);
+    return 0;
+}
+
+
+//Space- O(1), Time- O(n)
+#include <bits/stdc++.h>
+using namespace std;
+
+int getStairsJump(int n){
+    int prev1 = 1;
+    int prev2 = 2;
+    if(n<2) return 1;
+    for(int i=3; i<=n; i++){
+        int curr = prev1 + prev2;
+        prev1 = prev2;
+        prev2 = curr;
+    }
+    return prev2;
+}
+
+int main() {
+    int n;
+    cin >> n;
+    cout << getStairsJump(n);
+    return 0;
+}
