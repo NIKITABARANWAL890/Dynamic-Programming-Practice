@@ -1,0 +1,69 @@
+Recusrion:
+class Solution {
+public:
+int getRobbed(vector<int>&nums, int n){
+    if(n==0) return nums[0];
+    if(n<0) return 0;
+    int pick = nums[n] + getRobbed(nums, n-2);
+    int notPick = 0 + getRobbed(nums, n-1);
+    return max(pick, notPick);
+}
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        return getRobbed(nums, n-1);
+    }
+};
+
+Memoization:
+class Solution {
+public:
+int getRobbed(vector<int>&nums, int n, vector<int>&memo){
+    if(n==0) return nums[0];
+    if(n<0) return 0;
+    if(memo[n]!=-1)return memo[n];
+    int pick = nums[n] + getRobbed(nums, n-2, memo);
+    int notPick = 0 + getRobbed(nums, n-1, memo);
+    return memo[n] = max(pick, notPick);
+}
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        vector<int>memo(n+1, -1);
+        return getRobbed(nums, n-1, memo);
+    }
+};
+
+DP:
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        vector<int>dp(n, 0);
+        dp[0] = nums[0];
+        int neg = 0;
+        for(int i=1; i<n; i++){
+            int take = nums[i];
+            if(i>1) take += dp[i-2];
+            int notTake = 0 + dp[i-1];
+            dp[i] = max(take, notTake);
+        }
+        return dp[n-1];
+    }
+};
+
+Space Optimization:
+class Solution {
+public:
+    int rob(vector<int>& nums) {
+        int n = nums.size();
+        int prev1 = nums[0];
+        int prev2 = 0;
+        for(int i=1; i<n; i++){
+            int take = nums[i];
+            if(i>1) take += prev2;
+            int notTake = 0 + prev1;
+            int curri = max(take, notTake);
+            prev2 = prev1, prev1 = curri;
+        }
+        return prev1;
+    }
+};
