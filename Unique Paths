@@ -1,0 +1,84 @@
+Recursion:
+class Solution {
+public:
+long long mod = 2* 1e9;
+
+int uniquePathsHelper(int i, int j, int m, int n){
+    if(i==m-1 && j==n-1){
+        return 1;
+    }
+    long long left=0, right=0;
+    // if(i<0 || j<0) return 0;
+    if(i<m-1){
+        left = left + uniquePathsHelper(i+1, j, m, n);
+    }
+    if(j<n-1){
+        right = right + uniquePathsHelper(i, j+1, m, n);
+    }
+    return ((left)%mod+(right)%mod)%mod;
+}
+    int uniquePaths(int m, int n) {
+        return uniquePathsHelper(0, 0, m, n);
+    }
+};
+
+Memiozation:
+class Solution {
+public:
+long long mod = 2* 1e9;
+
+int uniquePathsHelper(int i, int j, int m, int n, vector<vector<int>>&memo){
+    if(i==m-1 && j==n-1){
+        return 1;
+    }
+    long long left=0, right=0;
+    if(memo[i][j]!=-1) return memo[i][j];
+    if(i<m-1){
+        left = left + uniquePathsHelper(i+1, j, m, n, memo);
+    }
+    if(j<n-1){
+        right = right + uniquePathsHelper(i, j+1, m, n, memo);
+    }
+    return memo[i][j] = ((left)%mod+(right)%mod)%mod;
+}
+    int uniquePaths(int m, int n) {
+        vector<vector<int>>memo(m, vector<int>(n, -1));
+        return uniquePathsHelper(0, 0, m, n, memo);
+    }
+};
+
+DP:
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        vector<vector<int>> dp(m, vector<int>(n, 1));
+        dp[0][0]=1;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if(i==0 && j==0) continue;
+                else{
+                    int left = 0, right = 0;
+                    if(i>0) left = dp[i-1][j];
+                    if(j>0) right = dp[i][j-1];
+                    dp[i][j] =(left + right);
+                }
+            }
+        }
+        return dp[m-1][n-1]; 
+    }
+};
+
+
+Space Optimization:
+class Solution {
+public:
+    int uniquePaths(int m, int n) {
+        vector<int>curr(n, 1);
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                curr[j] += curr[j-1];
+            }
+        }
+        return curr[n-1]; 
+    }
+};
