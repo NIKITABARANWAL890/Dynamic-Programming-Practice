@@ -1,0 +1,48 @@
+Recursion:
+class Solution {
+public:
+    int minimumTotalHelper(vector<vector<int>>& triangle, int m, int i, int last) {
+        if (i == m) { // Base case: last row
+            return triangle[i][last];
+        }
+        
+        int left = INT_MAX, right = INT_MAX;
+        left = triangle[i][last] + minimumTotalHelper(triangle, m, i + 1, last);
+        right = triangle[i][last] + minimumTotalHelper(triangle, m, i + 1, last + 1);
+
+        return min(left, right);
+    }
+
+    int minimumTotal(vector<vector<int>>& triangle) {
+        int m = triangle.size();
+        return minimumTotalHelper(triangle, m - 1, 0, 0);
+    }
+};
+
+Memoization:
+class Solution {
+public:
+    int minimumTotalHelper(vector<vector<int>>& triangle, int m, int i, int last, vector<vector<int>>&memo) {
+        if (i == m) { // Base case: last row
+            return triangle[i][last];
+        }
+        if(memo[i][last] != -1) return memo[i][last];
+        int left = INT_MAX, right = INT_MAX;
+        left = triangle[i][last] + minimumTotalHelper(triangle, m, i + 1, last, memo);
+        right = triangle[i][last] + minimumTotalHelper(triangle, m, i + 1, last + 1, memo);
+
+        return memo[i][last] = min(left, right);
+    }
+
+    int minimumTotal(vector<vector<int>>& triangle) {
+        int m = triangle.size();
+        vector<vector<int>> memo(m);  
+        for (int i = 0; i < m; i++) {  
+            memo[i] = vector<int>(i + 1, -1); 
+        }
+
+        return minimumTotalHelper(triangle, m - 1, 0, 0, memo);
+    }
+};
+
+DP:
