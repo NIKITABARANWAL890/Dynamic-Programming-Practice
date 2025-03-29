@@ -1,0 +1,64 @@
+Recursion:
+#include <bits/stdc++.h>
+using namespace std;
+
+int maximumChocolatesHelper(int r, int c, vector<vector<int>>& grid, int i, int j1, int j2) {
+    if (j1 < 0 || j1 >= c || j2 < 0 || j2 >= c) return -1e8; // Out of bounds
+
+    if (i == r - 1) { // Base case: last row
+        return (j1 == j2) ? grid[i][j1] : grid[i][j1] + grid[i][j2];
+    }
+
+    int maxSum = INT_MIN;
+
+    // Try all moves (-1, 0, +1) for both Alice and Bob
+    for (int dj1 = -1; dj1 <= 1; dj1++) {
+        for (int dj2 = -1; dj2 <= 1; dj2++) {
+            int newSum;
+            if (j1 == j2) {
+                newSum = grid[i][j1] + maximumChocolatesHelper(r, c, grid, i + 1, j1 + dj1, j2 + dj2);
+            } else {
+                newSum = grid[i][j1] + grid[i][j2] + maximumChocolatesHelper(r, c, grid, i + 1, j1 + dj1, j2 + dj2);
+            }
+            maxSum = max(maxSum, newSum);
+        }
+    }
+    return maxSum;
+}
+
+int maximumChocolates(int r, int c, vector<vector<int>> &grid) {
+    return maximumChocolatesHelper(r, c, grid, 0, 0, c - 1);
+}
+
+Memoization:
+#include <bits/stdc++.h>
+using namespace std;
+
+int maximumChocolatesHelper(int r, int c, vector<vector<int>>& grid, int i, int j1, int j2, vector<vector<vector<int>>>&memo) {
+    if (j1 < 0 || j1 >= c || j2 < 0 || j2 >= c) return -1e8; // Out of bounds
+
+    if (i == r - 1) { // Base case: last row
+        return (j1 == j2) ? grid[i][j1] : grid[i][j1] + grid[i][j2];
+    }
+
+    int maxSum = INT_MIN;
+    if(memo[i][j1][j2]!=-1) return memo[i][j1][j2];
+    // Try all moves (-1, 0, +1) for both Alice and Bob
+    for (int dj1 = -1; dj1 <= 1; dj1++) {
+        for (int dj2 = -1; dj2 <= 1; dj2++) {
+            int newSum;
+            if (j1 == j2) {
+                newSum = grid[i][j1] + maximumChocolatesHelper(r, c, grid, i + 1, j1 + dj1, j2 + dj2, memo);
+            } else {
+                newSum = grid[i][j1] + grid[i][j2] + maximumChocolatesHelper(r, c, grid, i + 1, j1 + dj1, j2 + dj2, memo);
+            }
+            maxSum = max(maxSum, newSum);
+        }
+    }
+    return memo[i][j1][j2] = maxSum;
+}
+
+int maximumChocolates(int r, int c, vector<vector<int>> &grid) {
+    vector<vector<vector<int>>> memo(r, vector<vector<int>>(c, vector<int>(c, -1)));
+    return maximumChocolatesHelper(r, c, grid, 0, 0, c - 1, memo);
+}
