@@ -1,0 +1,111 @@
+Recursion:
+class Solution {
+public:
+int minFallingPathSumHelper(vector<vector<int>>& matrix, int n, int i, int j){
+    if(i==n-1) return matrix[i][j];
+    int left = INT_MAX, right = INT_MAX, below = INT_MAX;
+    if(j>0) left = matrix[i][j] + minFallingPathSumHelper(matrix, n, i+1, j-1);
+    below = matrix[i][j] + minFallingPathSumHelper(matrix, n, i+1, j);
+    if(j<n-1) right = matrix[i][j] + minFallingPathSumHelper(matrix, n, i+1, j+1);
+    return min(left, min(right, below));
+}
+    int minFallingPathSum(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        int minSum = INT_MAX;
+        for(int k=0; k<n; k++){
+            minSum = min(minSum, minFallingPathSumHelper(matrix, n, 0, k));
+        }
+        return minSum;
+    }
+};
+
+Memoization:
+class Solution {
+public:
+int minFallingPathSumHelper(vector<vector<int>>& matrix, int n, int i, int j, vector<vector<int>>&memo){
+    if(i==n-1) return matrix[i][j];
+    int left = INT_MAX, right = INT_MAX, below = INT_MAX;
+    if(memo[i][j] != -1) return memo[i][j];
+    if(j>0) left = matrix[i][j] + minFallingPathSumHelper(matrix, n, i+1, j-1, memo);
+    below = matrix[i][j] + minFallingPathSumHelper(matrix, n, i+1, j, memo);
+    if(j<n-1) right = matrix[i][j] + minFallingPathSumHelper(matrix, n, i+1, j+1, memo);
+    return memo[i][j] = min(left, min(right, below));
+}
+    int minFallingPathSum(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        vector<vector<int>>memo(n, vector<int>(n, -1));
+        int minSum = INT_MAX;
+        for(int k=0; k<n; k++){
+            minSum = min(minSum, minFallingPathSumHelper(matrix, n, 0, k, memo));
+        }
+        return minSum;
+    }
+};
+
+DP:
+class Solution {
+public:
+    int minFallingPathSum(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        vector<vector<int>> dp(n, vector<int>(n, 0));
+
+        // Base case: Copy the last row from matrix to dp
+        for (int j = 0; j < n; j++) {
+            dp[n - 1][j] = matrix[n - 1][j];
+        }
+
+        // Fill DP table from bottom to top
+        for (int i = n - 2; i >= 0; i--) { // Rows
+            for (int j = 0; j < n; j++) { // Columns
+                int left = (j > 0) ? dp[i + 1][j - 1] : INT_MAX;
+                int below = dp[i + 1][j];
+                int right = (j < n - 1) ? dp[i + 1][j + 1] : INT_MAX;
+
+                dp[i][j] = matrix[i][j] + min(left, min(below, right));
+            }
+        }
+
+        // Find the minimum value in the first row
+        int minSum = INT_MAX;
+        for (int j = 0; j < n; j++) {
+            minSum = min(minSum, dp[0][j]);
+        }
+
+        return minSum;
+    }
+};
+
+
+Space Optimization:
+class Solution {
+public:
+    int minFallingPathSum(vector<vector<int>>& matrix) {
+        int n = matrix.size();
+        vector<int>prev(n, 0);
+        vector<int>curr(n, 0);
+        // Base case: Copy the last row from matrix to dp
+        for (int j = 0; j < n; j++) {
+            prev[j] = matrix[n - 1][j];
+        }
+
+        // Fill DP table from bottom to top
+        for (int i = n - 2; i >= 0; i--) { // Rows
+            for (int j = 0; j < n; j++) { // Columns
+                int left = (j > 0) ? prev[j - 1] : INT_MAX;
+                int below = prev[j];
+                int right = (j < n - 1) ? prev[j + 1] : INT_MAX;
+
+                curr[j] = matrix[i][j] + min(left, min(below, right));
+            }
+            prev = curr;
+        }
+
+        // Find the minimum value in the first row
+        int minSum = INT_MAX;
+        for (int j = 0; j < n; j++) {
+            minSum = min(minSum, prev[j]);
+        }
+
+        return minSum;
+    }
+};
