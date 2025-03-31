@@ -1,0 +1,99 @@
+Recusrion:
+
+class Solution {
+  public:
+  bool isSubsetSumHelper(vector<int>&arr, int sum, int ind){
+      if(sum==0) return true;
+      if(ind==0){
+          return sum==arr[0];
+      }
+      bool notTake = isSubsetSumHelper(arr, sum, ind-1);
+      bool take = false;
+      if(sum>=arr[ind]){
+          take = isSubsetSumHelper(arr, sum-arr[ind], ind-1);
+      }
+      return take || notTake;
+  }
+    bool isSubsetSum(vector<int>& arr, int sum) {
+        // code here
+        int n=arr.size();
+        return isSubsetSumHelper(arr, sum, n-1);
+    }
+};
+
+Memoization:
+class Solution {
+  public:
+  bool isSubsetSumHelper(vector<int>& arr, int sum, int ind, vector<vector<int>>& memo) {
+      if(sum == 0) return true;
+      if(ind == 0) return sum == arr[0];
+      
+      if(memo[ind][sum] != -1) return memo[ind][sum];
+
+      bool notTake = isSubsetSumHelper(arr, sum, ind - 1, memo);
+      bool take = false;
+      
+      if(sum >= arr[ind]) {
+          take = isSubsetSumHelper(arr, sum - arr[ind], ind - 1, memo);
+      }
+      
+      return memo[ind][sum] = take || notTake;
+  }
+
+  bool isSubsetSum(vector<int>& arr, int sum) {
+      int n = arr.size();
+      vector<vector<int>> memo(n, vector<int>(sum + 1, -1));
+      return isSubsetSumHelper(arr, sum, n - 1, memo);
+  }
+};
+
+DP:
+
+class Solution {
+  public:
+  bool isSubsetSum(vector<int>& arr, int sum) {
+      int n = arr.size();
+      vector<vector<bool>> dp(n, vector<bool>(sum + 1, 0));
+      for(int i=0; i<n; i++){
+          dp[i][0]=true;
+      }
+      dp[0][arr[0]]=true;
+      for(int i=1; i<n; i++){
+          for(int j=1; j<=sum; j++){
+              bool notTake = dp[i-1][j];
+              bool take = false;
+              if(j>=arr[i]){
+                  take = dp[i-1][j-arr[i]];
+              }
+              dp[i][j] = take || notTake;
+          }
+      }
+      return dp[n-1][sum];
+  }
+};
+
+
+Space Optimization:
+class Solution {
+  public:
+  bool isSubsetSum(vector<int>& arr, int sum) {
+      int n = arr.size();
+      vector<bool>prev(sum+1, 0);
+      vector<bool>curr(sum+1, 0);
+      prev[0]=true;
+      curr[0]=true;
+      prev[arr[0]]=true;
+      for(int i=1; i<n; i++){
+          for(int j=1; j<=sum; j++){
+              bool notTake = prev[j];
+              bool take = false;
+              if(j>=arr[i]){
+                  take = prev[j-arr[i]];
+              }
+              curr[j] = take || notTake;
+          }
+          prev = curr;
+      }
+      return prev[sum];
+  }
+};
