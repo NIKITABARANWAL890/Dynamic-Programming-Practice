@@ -1,0 +1,54 @@
+Recursion:
+class Solution {
+public:
+long long mostPointsHelper(vector<vector<int>>& questions, int n, int ind, int maxi){
+    if(ind>=n) return maxi;
+    if(ind==n-1){
+        return maxi+questions[ind][0];
+    }
+    int take = mostPointsHelper(questions, n, ind+questions[ind][1]+1, maxi+questions[ind][0]);
+    int notTake = mostPointsHelper(questions, n, ind+1, maxi);
+    return max(take, notTake);
+}
+    long long mostPoints(vector<vector<int>>& questions) {
+        int n=questions.size();
+        return mostPointsHelper(questions, n, 0, 0);
+    }
+};
+
+Memoization:
+class Solution {
+public:
+long long mostPointsHelper(vector<vector<int>>& questions, int n, int ind, vector<long long>&memo){
+    if(ind>=n) return 0;
+    if(ind==n-1) return questions[ind][0];
+    if(memo[ind] != -1) return memo[ind];
+    int take = questions[ind][0] + mostPointsHelper(questions, n, ind+questions[ind][1]+1, memo);
+    int notTake = mostPointsHelper(questions, n, ind+1, memo);
+    return memo[ind] = max(take, notTake);
+}
+    long long mostPoints(vector<vector<int>>& questions) {
+        int n=questions.size();
+        vector<long long>memo(n, -1);
+        return mostPointsHelper(questions, n, 0, memo);
+    }
+};
+
+DP:
+class Solution {
+public:
+    long long mostPoints(vector<vector<int>>& questions) {
+        int n=questions.size();
+        vector<long long>dp(n, 0);
+        dp[n-1] = questions[n-1][0];
+        for(int ind=n-2; ind>=0; ind--){
+            long long take = questions[ind][0];
+            if(ind+questions[ind][1]+1<n){
+                take = questions[ind][0] + dp[ind+questions[ind][1]+1];
+            }
+            long long notTake = dp[ind+1];
+            dp[ind] = max(take, notTake);
+        }
+        return dp[0];
+    }
+};
